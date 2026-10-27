@@ -1,0 +1,40 @@
+name: Gerar Relatórios PortoEx
+
+on:
+  # Permite rodar manualmente pelo botão no GitHub
+  workflow_dispatch:
+
+  # Roda automaticamente de segunda a sexta às 8h (horário de Brasília = 11h UTC)
+  schedule:
+    - cron: "0 11 * * 1-5"
+
+  # Roda automaticamente quando novos arquivos são enviados para /data
+  push:
+    paths:
+      - "data/**"
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   # necessário para fazer commit dos HTMLs gerados
+
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Gerar relatórios
+        run: python scripts/main.py
+
+      - name: Commit e push dos relatórios gerados
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add outputs/
+          git diff --staged --quiet || git commit -m "📊 Relatórios atualizados — $(date +'%d/%m/%Y %H:%M')"
+          git push
