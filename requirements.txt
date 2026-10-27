@@ -1,0 +1,9 @@
+# PortoEx Reports — Dependências Python
+# Instale com: pip install -r requirements.txt
+#
+# Este projeto usa apenas bibliotecas da biblioteca padrão do Python 3.11+
+# (csv, os, glob, json, html.parser, datetime, collections)
+# Não há dependências externas necessárias para rodar localmente.
+#
+# Para desenvolvimento opcional:
+# pytest==8.3.2
