@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GROT PortoEx – Outubro 2026</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:"Segoe UI",Arial,sans-serif; background:#f0f2f5; color:#222; }
+  header { background:linear-gradient(135deg,#1a237e,#283593); color:#fff; padding:18px 28px; display:flex; justify-content:space-between; align-items:center; }
+  header h1 { font-size:1.5rem; font-weight:700; }
+  header .sub { font-size:.85rem; opacity:.85; margin-top:4px; }
+  .badge { background:#fff2; border-radius:6px; padding:6px 14px; font-size:.82rem; text-align:right; }
+  .container { max-width:1300px; margin:0 auto; padding:20px 16px; }
+  .section-title { font-size:1.05rem; font-weight:700; color:#1a237e; margin:24px 0 10px; border-left:4px solid #1a237e; padding-left:10px; }
+  .kpi-row { display:flex; gap:14px; flex-wrap:wrap; margin-bottom:4px; }
+  .kpi { flex:1; min-width:160px; background:#fff; border-radius:10px; padding:14px 16px; box-shadow:0 1px 6px #0001; }
+  .kpi .label { font-size:.72rem; color:#888; text-transform:uppercase; }
+  .kpi .value { font-size:1.55rem; font-weight:700; margin-top:4px; }
+  .kpi .sub { font-size:.75rem; color:#666; margin-top:2px; }
+  .kpi.orange{border-top:3px solid #f57c00;} .kpi.blue{border-top:3px solid #1976d2;}
+  .kpi.purple{border-top:3px solid #7b1fa2;} .kpi.green{border-top:3px solid #43a047;} .kpi.red{border-top:3px solid #e53935;}
+  .unit-grid { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+  .unit-card { background:#fff; border-radius:12px; padding:18px; box-shadow:0 1px 8px #0001; }
+  .unit-card h3 { font-size:1rem; font-weight:700; margin-bottom:12px; padding-bottom:8px; border-bottom:2px solid; }
+  .unit-card.matriz h3{border-color:#f57c00;color:#e65100;} .unit-card.filial h3{border-color:#1976d2;color:#0d47a1;}
+  .stat-row { display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid #f0f0f0; font-size:.85rem; }
+  .stat-row:last-child{border-bottom:none;} .stat-label{color:#666;} .stat-val{font-weight:600;}
+  .prog-wrap { background:#e0e0e0; border-radius:999px; height:10px; margin:8px 0; overflow:hidden; }
+  .prog-bar { height:100%; border-radius:999px; }
+  .prog-bar.orange{background:linear-gradient(90deg,#f57c00,#ffa726);} .prog-bar.blue{background:linear-gradient(90deg,#1976d2,#42a5f5);}
+  .charts-grid { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+  .chart-card { background:#fff; border-radius:12px; padding:16px; box-shadow:0 1px 8px #0001; }
+  .chart-card h4{font-size:.88rem;font-weight:700;color:#555;margin-bottom:10px;}
+  .vendor-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+  .vendor-card{background:#fff;border-radius:12px;padding:16px;box-shadow:0 1px 8px #0001;}
+  .vendor-card h4{font-size:.88rem;font-weight:700;margin-bottom:10px;}
+  .vend-row{display:flex;align-items:center;gap:8px;margin:5px 0;font-size:.82rem;}
+  .vend-name{width:100px;font-weight:600;} .vend-bar-wrap{flex:1;background:#eee;border-radius:4px;height:7px;overflow:hidden;}
+  .vend-bar{height:100%;border-radius:4px;} .vend-pct{width:44px;text-align:right;font-weight:700;}
+  .vend-val{width:90px;text-align:right;color:#666;font-size:.78rem;}
+  .tag-green{background:#e8f5e9;color:#2e7d32;font-size:.72rem;padding:1px 6px;border-radius:4px;font-weight:600;}
+  .tag-warn{background:#fff8e1;color:#f57c00;font-size:.72rem;padding:1px 6px;border-radius:4px;font-weight:600;}
+  .tag-red{background:#ffebee;color:#c62828;font-size:.72rem;padding:1px 6px;border-radius:4px;font-weight:600;}
+  .top-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+  .top-card{background:#fff;border-radius:12px;padding:16px;box-shadow:0 1px 8px #0001;}
+  .top-card h4{font-size:.88rem;font-weight:700;margin-bottom:10px;}
+  .top-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid #f5f5f5;font-size:.82rem;}
+  .top-row:last-child{border-bottom:none;} .top-rank{width:22px;color:#aaa;font-weight:700;} .top-name{flex:1;padding:0 6px;} .top-val{font-weight:700;} .top-pct{width:42px;text-align:right;color:#999;font-size:.78rem;}
+  .pipe-card{background:#fff;border-radius:12px;padding:18px;box-shadow:0 1px 8px #0001;}
+  .lot-card{background:#fff;border-radius:12px;padding:18px;box-shadow:0 1px 8px #0001;}
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+  .pipe-row{display:grid;grid-template-columns:160px 60px 110px 60px 80px;gap:8px;align-items:center;font-size:.82rem;padding:5px 0;border-bottom:1px solid #f0f0f0;}
+  .pipe-row:last-child{border-bottom:none;} .pipe-hdr{font-size:.72rem;font-weight:700;color:#999;text-transform:uppercase;}
+  .alert{background:#fff8e1;border-left:4px solid #ffa000;border-radius:6px;padding:10px 14px;font-size:.82rem;margin-bottom:14px;color:#555;}
+  .alert.info{background:#e3f2fd;border-color:#1976d2;}
+  footer{text-align:center;font-size:.75rem;color:#aaa;margin:30px 0 16px;}
+  @media(max-width:700px){.unit-grid,.charts-grid,.vendor-grid,.top-grid,.two-col{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>GROT - Relatorio Operacional PortoEx</h1>
+    <div class="sub">Parcial: dias 1 ao 19 util | Gerado em 28/10/2026</div>
+  </div>
+  <div class="badge">19 de 21 dias uteis<br><strong>90,5% do mes</strong></div>
+</header>
+<div class="container">
+
+  <div class="section-title">Visao Geral do Mes</div>
+  <div class="kpi-row">
+    <div class="kpi orange"><div class="label">MATRIZ Faturado</div><div class="value" style="color:#e65100">R$2.720.887</div><div class="sub">2,369 NFs - ticket R$1.149</div></div>
+    <div class="kpi blue"><div class="label">FILIAL Faturado</div><div class="value" style="color:#0d47a1">R$881.542</div><div class="sub">2,750 NFs - ticket R$321</div></div>
+    <div class="kpi purple"><div class="label">Total Geral</div><div class="value" style="color:#4a148c">R$3.602.428</div><div class="sub">5,119 NFs totais</div></div>
+    <div class="kpi green"><div class="label">Media / Dia</div><div class="value" style="color:#2e7d32">R$189.601</div><div class="sub">M: R$143.205 - F: R$46.397</div></div>
+    <div class="kpi red"><div class="label">Falta para Meta</div><div class="value" style="color:#b71c1c">R$697.572</div><div class="sub">em 2 dias uteis restantes</div></div>
+  </div>
+
+  <div class="section-title">Desempenho por Unidade</div>
+  <div class="unit-grid">
+    <div class="unit-card matriz">
+      <h3>MATRIZ - Itajai SC</h3>
+      <div class="stat-row"><span class="stat-label">Faturamento acumulado</span><span class="stat-val">R$2.720.886,70</span></div>
+      <div class="stat-row"><span class="stat-label">Meta do mes</span><span class="stat-val">R$3.100.000,00</span></div>
+      <div class="stat-row"><span class="stat-label">% atingido</span><span class="stat-val" style="color:#e53935">87,8% ⚠️ ABAIXO</span></div>
+      <div class="stat-row"><span class="stat-label">Ideal (19/21 dias)</span><span class="stat-val">90,5%</span></div>
+      <div class="prog-wrap"><div class="prog-bar orange" style="width:87.8%"></div></div>
+      <div class="stat-row"><span class="stat-label">Falta atingir</span><span class="stat-val" style="color:#e53935">R$379.113</span></div>
+      <div class="stat-row"><span class="stat-label">Necessario / dia (2 dias)</span><span class="stat-val">R$189.557</span></div>
+      <div class="stat-row"><span class="stat-label">Media realizada / dia</span><span class="stat-val">R$143.205</span></div>
+      <div class="stat-row"><span class="stat-label">Total de NFs</span><span class="stat-val">2,369</span></div>
+    </div>
+    <div class="unit-card filial">
+      <h3>FILIAL - Sao Paulo SP</h3>
+      <div class="stat-row"><span class="stat-label">Faturamento acumulado</span><span class="stat-val">R$881.541,80</span></div>
+      <div class="stat-row"><span class="stat-label">Meta do mes</span><span class="stat-val">R$1.200.000,00</span></div>
+      <div class="stat-row"><span class="stat-label">% atingido</span><span class="stat-val" style="color:#e53935">73,5% ⚠️ ABAIXO</span></div>
+      <div class="stat-row"><span class="stat-label">Ideal (19/21 dias)</span><span class="stat-val">90,5%</span></div>
+      <div class="prog-wrap"><div class="prog-bar blue" style="width:73.5%"></div></div>
+      <div class="stat-row"><span class="stat-label">Falta atingir</span><span class="stat-val" style="color:#e53935">R$318.458</span></div>
+      <div class="stat-row"><span class="stat-label">Necessario / dia (2 dias)</span><span class="stat-val">R$159.229</span></div>
+      <div class="stat-row"><span class="stat-label">Media realizada / dia</span><span class="stat-val">R$46.397</span></div>
+      <div class="stat-row"><span class="stat-label">Total de NFs</span><span class="stat-val">2,750</span></div>
+    </div>
+  </div>
+
+  <div class="section-title">Evolucao Diaria</div>
+  <div class="charts-grid">
+    <div class="chart-card"><h4>Faturamento Diario por Unidade</h4><canvas id="dailyChart" height="180"></canvas></div>
+    <div class="chart-card"><h4>Acumulado vs Meta</h4><canvas id="acumChart" height="180"></canvas></div>
+  </div>
+
+  <div class="section-title">Performance por Vendedor</div>
+  <div class="vendor-grid">
+    <div class="vendor-card">
+      <h4 style="color:#e65100">MATRIZ - Vendedores</h4>
+      
+      <div class="vend-row">
+        <span class="vend-name">CORPORATIVOS</span>
+        <div class="vend-bar-wrap"><div class="vend-bar" style="width:65.9%;background:#2e7d32"></div></div>
+        <span class="vend-pct" style="color:#2e7d32">65,9%</span>
+        <span class="vend-val">R$1.793.945</span>
+        <span class="tag-green">OK ✅</span>
+      </div>
+      <div class="vend-row">
+        <span class="vend-name">TIAGO</span>
+        <div class="vend-bar-wrap"><div class="vend-bar" style="width:12.9%;background:#f57c00"></div></div>
+        <span class="vend-pct" style="color:#f57c00">12,9%</span>
+        <span class="vend-val">R$349.727</span>
+        <span class="tag-warn">ABAIXO</span>
+      </div>
+      <div class="vend-row">
+        <span class="vend-name">URIEL</span>
+        <div class="vend-bar-wrap"><div class="vend-bar" style="width:11.1%;background:#f57c00"></div></div>
+        <span class="vend-pct" style="color:#f57c00">11,1%</span>
+        <span class="vend-val">R$300.893</span>
+        <span class="tag-warn">ABAIXO</span>
+      </div>
+      <div class="vend-row">
+        <span class="vend-name">OUTROS</span>
+        <div class="vend-bar-wrap"><div class="vend-bar" style="width:7.7%;background:#888"></div></div>
+        <span class="vend-pct" style="color:#888">7,7%</span>
+        <span class="vend-val">R$209.582</span>
+        <span style="font-size:.72rem;color:#888">s/meta</span>
+      </div>
+      <div class="vend-row">
+        <span class="vend-name">CAIO</span>
+        <div class="vend-bar-wrap"><div class="vend-bar" style="width:2.5%;background:#f57c00"></div></div>
+        <span class="vend-pct" style="color:#f57c00">2,5%</span>
+        <span class="vend-val">R$66.740</span>
+        <span class="tag-warn">ABAIXO</span>
+      </div>
+    </div>
+    <div class="vendor-card">
+      <h4 style="color:#0d47a1">FILIAL - Vendedores</h4>
+      
+      <div class="vend-row">
+        <span class="vend-name">CORPORATIVOS</span>
+        <div class="vend-bar-wrap"><div class="vend-bar" style="width:54.3%;background:#2e7d32"></div></div>
+        <span class="vend-pct" style="color:#2e7d32">54,3%</span>
+        <span class="vend-val">R$478.965</span>
+        <span class="tag-green">ACIMA ✅</span>
+      </div>
+      <div class="vend-row">
+        <span class="vend-name">URIEL</span>
+        <div class="vend-bar-wrap"><div class="vend-bar" style="width:14.6%;background:#888"></div></div>
+        <span class="vend-pct" style="color:#888">14,6%</span>
+        <span class="vend-val">R$128.574</span>
+        <span style="font-size:.72rem;color:#888">s/meta</span>
+      </div>
+      <div class="vend-row">
+        <span class="vend-name">OUTROS</span>
+        <div class="vend-bar-wrap"><div class="vend-bar" style="width:12.1%;background:#888"></div></div>
+        <span class="vend-pct" style="color:#888">12,1%</span>
+        <span class="vend-val">R$106.699</span>
+        <span style="font-size:.72rem;color:#888">s/meta</span>
+      </div>
+      <div class="vend-row">
+        <span class="vend-name">TIAGO</span>
+        <div class="vend-bar-wrap"><div class="vend-bar" style="width:9.8%;background:#f57c00"></div></div>
+        <span class="vend-pct" style="color:#f57c00">9,8%</span>
+        <span class="vend-val">R$86.792</span>
+        <span class="tag-warn">ABAIXO</span>
+      </div>
+      <div class="vend-row">
+        <span class="vend-name">CAIO</span>
+        <div class="vend-bar-wrap"><div class="vend-bar" style="width:4.6%;background:#f57c00"></div></div>
+        <span class="vend-pct" style="color:#f57c00">4,6%</span>
+        <span class="vend-val">R$40.290</span>
+        <span class="tag-warn">ABAIXO</span>
+      </div>
+      <div class="vend-row">
+        <span class="vend-name">MARCELO</span>
+        <div class="vend-bar-wrap"><div class="vend-bar" style="width:4.6%;background:#f57c00"></div></div>
+        <span class="vend-pct" style="color:#f57c00">4,6%</span>
+        <span class="vend-val">R$40.222</span>
+        <span class="tag-warn">ABAIXO</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">Top 10 Clientes</div>
+  <div class="top-grid">
+    <div class="top-card">
+      <h4 style="color:#e65100">MATRIZ - Top 10</h4>
+      
+      <div class="top-row">
+        <span class="top-rank">1</span>
+        <span class="top-name">MATTEL DO BRASIL LTDA</span>
+        <span class="top-val">R$465.976</span>
+        <span class="top-pct">17,1%</span>
+      </div>
+      <div class="top-row">
+        <span class="top-rank">2</span>
+        <span class="top-name">SAMSONITE BRASIL LTDA</span>
+        <span class="top-val">R$245.450</span>
+        <span class="top-pct">9,0%</span>
+      </div>
+      <div class="top-row">
+        <span class="top-rank">3</span>
+        <span class="top-name">FORTE TRANSPORTES DO BRASIL@TLDA</span>
+        <span class="top-val">R$235.014</span>
+        <span class="top-pct">8,6%</span>
+      </div>
+      <div class="top-row">
+        <span class="top-rank">4</span>
+        <span class="top-name">ITAPOA TERMINAIS PORTUARIOS S/A</span>
+        <span class="top-val">R$182.240</span>
+        <span class="top-pct">6,7%</span>
+      </div>
+      <div class="top-row">
+        <span class="top-rank">5</span>
+        <span class="top-name">AC COMERCIAL IMPORTADORA E EXPORTAD…</span>
+        <span class="top-val">R$142.613</span>
+        <span class="top-pct">5,2%</span>
+      </div>
+      <div class="top-row">
+        <span class="top-rank">6</span>
+        <span class="top-name">BRAFT DO BRASIL IMPORTACAO E EXPORT…</span>
+        <span class="top-val">R$109.917</span>
+        <span class="top-pct">4,0%</span>
+      </div>
+      <div class="top-row">
+        <span class="top-rank">7</span>
+        <span class="top-name">VENTUNO PRODUTOS TEXTEIS LTDA</span>
+        <span class="top-val">R$92.685</span>
+        <span class="top-pct">3,4%</span>
+      </div>
+      <div class="top-row">
+        <span class="top-rank">8</span>
+        <span class="top-name">TECADI ARMAZENS GERAIS LTDA(ITAIPAV…</span>
+        <span class="top-val">R$84.625</span>
+        <span class="top-pct">3,1%</span>
+      </div>
+      <div class="top-row">
+        <span class="top-rank">9</span>
+        <span class="top-name">SKO COMERCIO IMPORTACAO E EXPORTACA…</span>
+        <span class="top-val">R$79.081</span>
+        <span class="top-pct">2,9%</span>
+      </div>
+      <div class="top-row">
+        <span class="top-rank">10</span>
+        <span class="top-name">DL FESTAS COMERCIAL LTDA</span>
+        <span class="top-val">R$60.131</span>
+        <span class="top-pct">2,2%</span>
+      </div>
+    </div>
+    <div class="top-card">
+      <h4 style="color:#0d47a1">FILIAL - Top 10</h4>
+      
+      <div class="top-row">
+        <span class="top-rank">1</span>
+        <span class="top-name">ANSELL BRAZIL LTDA.</span>
+        <span class="top-val">R$276.137</span>
+        <span class="top-pct">31,3%</span>
+      </div>
+      <div class="top-row">
+        <span class="top-rank">2</span>
+        <span class="top-name">PORTOEXPRESS LOGISTICA LTDA</span>
+        <span class="top-val">R$104.000</span>
+        <span class="top-pct">11,8%</span>
+      </div>
+      <div class="top-row">
+        <span class="top-rank">3</span>
+        <span class="top-name">IND.E COM.LEAL - NVT</span>
+        <span class="top-val">R$99.186</span>
+        <span class="top-pct">11,3%</span>
+      </div>
+      <div class="top-row">
+        <span class="top-rank">4</span>
+        <span class="top-name">HERCULES EQUIPAMENTOS DE PROTECAO L…</span>
+        <span class="top-val">R$65.181</span>
+        <span class="top-pct">7,4%</span>
+      </div>
+      <div class="top-row">
+        <span class="top-rank">5</span>
+        <span class="top-name">PEX LOGISTICA INTEGRADA LTDA</span>
+        <span class="top-val">R$26.204</span>
+        <span class="top-pct">3,0%</span>
+      </div>
+      <div class="top-row">
+        <span class="top-rank">6</span>
+        <span class="top-name">CRIALED RETAIL MEDIA</span>
+        <span class="top-val">R$19.835</span>
+        <span class="top-pct">2,3%</span>
+      </div>
+      <div class="top-row">
+        <span class="top-rank">7</span>
+        <span class="top-name">BRAFT DO BRASIL IMPORTACAO E EXPORT…</span>
+        <span class="top-val">R$17.151</span>
+        <span class="top-pct">1,9%</span>
+      </div>
+      <div class="top-row">
+        <span class="top-rank">8</span>
+        <span class="top-name">KUKA PRODUTOS INFANTIS LTDA</span>
+        <span class="top-val">R$14.367</span>
+        <span class="top-pct">1,6%</span>
+      </div>
+      <div class="top-row">
+        <span class="top-rank">9</span>
+        <span class="top-name">AC COMERCIAL IMPORTADORA E EXPORTAD…</span>
+        <span class="top-val">R$13.661</span>
+        <span class="top-pct">1,5%</span>
+      </div>
+      <div class="top-row">
+        <span class="top-rank">10</span>
+        <span class="top-name">BRAFT DO BRASIL IMPORTACAO E EXPORT…</span>
+        <span class="top-val">R$12.423</span>
+        <span class="top-pct">1,4%</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">Personalizado L (Lotacao)</div>
+  <div class="two-col">
+    <div class="lot-card">
+      <h4>Resumo Lotacao - Outubro 2026</h4>
+      <div class="stat-row"><span class="stat-label">Total NFs Lotacao</span><span class="stat-val">100</span></div>
+      <div class="stat-row"><span class="stat-label">Faturamento Total</span><span class="stat-val">R$641.461,23</span></div>
+      <div class="stat-row"><span class="stat-label">MATRIZ</span><span class="stat-val">89 NFs - R$617.186</span></div>
+      <div class="stat-row"><span class="stat-label">FILIAL</span><span class="stat-val">11 NFs - R$24.275</span></div>
+      <br>
+      <h4 style="margin-bottom:8px">MATRIZ por Modalidade</h4>
+      <div class="stat-row"><span class="stat-label">PERSONALIZADO_L 3/4</span><span class="stat-val">23 NFs - R$191.643</span></div>
+<div class="stat-row"><span class="stat-label">PERSONALIZADO_L TRUCK</span><span class="stat-val">20 NFs - R$121.988</span></div>
+<div class="stat-row"><span class="stat-label">PERSONALIZADO_L</span><span class="stat-val">12 NFs - R$97.623</span></div>
+<div class="stat-row"><span class="stat-label">PERSONALIZADO_L CARRETA</span><span class="stat-val">7 NFs - R$74.753</span></div>
+<div class="stat-row"><span class="stat-label">PERSONALIZADO_L CNTR</span><span class="stat-val">13 NFs - R$55.293</span></div>
+<div class="stat-row"><span class="stat-label">PERSONALIZADO_L VAN</span><span class="stat-val">10 NFs - R$50.500</span></div>
+<div class="stat-row"><span class="stat-label">PERSONALIZADO_L TOCO</span><span class="stat-val">3 NFs - R$25.172</span></div>
+<div class="stat-row"><span class="stat-label">PERSONALIZADO_L FIORINO</span><span class="stat-val">1 NFs - R$215</span></div>
+
+    </div>
+    <div class="lot-card">
+      <h4 style="margin-bottom:8px">FILIAL por Modalidade</h4>
+      <div class="stat-row"><span class="stat-label">PERSONALIZADO_L VAN</span><span class="stat-val">3 NFs - R$10.501</span></div>
+<div class="stat-row"><span class="stat-label">PERSONALIZADO_L 3/4</span><span class="stat-val">3 NFs - R$6.305</span></div>
+<div class="stat-row"><span class="stat-label">PERSONALIZADO_L FIORINO</span><span class="stat-val">4 NFs - R$4.595</span></div>
+<div class="stat-row"><span class="stat-label">PERSONALIZADO_L</span><span class="stat-val">1 NFs - R$2.874</span></div>
+
+    </div>
+  </div>
+
+  <div class="section-title">Pipeline - Cotacoes</div>
+  <div class="alert info">Cotacoes ativas: <strong>22 abertas - R$1.793.805</strong> | MATRIZ: 0 cot. / R$0 - FILIAL: 0 cot. / R$0 | 0 vencem hoje - 16 vencidas - 42 reprovadas.</div>
+  <div class="pipe-card">
+    <div class="pipe-row pipe-hdr"><span>Unidade</span><span>Abertas</span><span>Valor</span><span>Hoje</span><span>Vencidas</span></div>
+    <div class="pipe-row"><span>MATRIZ</span><span>0</span><span>R$0</span><span>-</span><span style="color:#e53935">-</span></div>
+    <div class="pipe-row"><span>FILIAL SP</span><span>0</span><span>R$0</span><span style="color:#f57c00">0</span><span style="color:#e53935">-</span></div>
+    <div class="pipe-row" style="font-weight:700"><span>TOTAL</span><span>22</span><span>R$1.793.805</span><span style="color:#f57c00">0</span><span style="color:#e53935">16</span></div>
+  </div>
+
+</div>
+<footer>PortoEx - GROT Outubro 2026 - Gerado em 28/10/2026</footer>
+<script>
+var dias=["01/10", "02/10", "05/10", "06/10", "07/10", "08/10", "09/10", "13/10", "14/10", "15/10", "16/10", "19/10", "20/10", "21/10", "22/10", "23/10", "26/10", "27/10", "28/10"];
+var m_daily=[115387.19, 164447.27, 130547.12, 92674.36, 181820.36, 117575.34, 80610.3, 312026.52, 104545.4, 277985.73, 134226.89, 108413.3, 203368.79, 196945.16, 148655.67, 141096.85, 119784.2, 90776.25, 0.0];
+var f_daily=[61647.85, 35164.68, 17052.75, 68272.51, 61386.74, 63446.68, 62960.61, 31117.04, 55521.23, 51504.2, 41142.15, 64869.87, 29399.06, 41859.36, 25830.25, 95800.6, 44726.18, 29840.04, 0.0];
+var m_acum=[115387.19, 279834.46, 410381.58, 503055.94, 684876.3, 802451.64, 883061.94, 1195088.46, 1299633.86, 1577619.59, 1711846.48, 1820259.78, 2023628.57, 2220573.73, 2369229.4, 2510326.25, 2630110.45, 2720886.7, 2720886.7];
+var f_acum=[61647.85, 96812.53, 113865.28, 182137.79, 243524.53, 306971.21, 369931.82, 401048.86, 456570.09, 508074.29, 549216.44, 614086.31, 643485.37, 685344.73, 711174.98, 806975.58, 851701.76, 881541.8, 881541.8];
+var metaM=Array(dias.length).fill(3100000.0);
+var metaF=Array(dias.length).fill(1200000.0);
+var idealLine=dias.map(function(_,i){return parseFloat(((3100000.0+1200000.0)*(i+1)/dias.length).toFixed(0));});
+
+new Chart(document.getElementById('dailyChart'), {
+  type:'bar',
+  data:{labels:dias,datasets:[
+    {label:'MATRIZ',data:m_daily,backgroundColor:'rgba(245,124,0,0.7)',borderRadius:3},
+    {label:'FILIAL',data:f_daily,backgroundColor:'rgba(25,118,210,0.7)',borderRadius:3}
+  ]},
+  options:{responsive:true,plugins:{legend:{position:'top'}},scales:{y:{ticks:{callback:function(v){return'R$'+v.toLocaleString('pt-BR');}}}}}
+}});
+
+new Chart(document.getElementById('acumChart'), {
+  type:'line',
+  data:{labels:dias,datasets:[
+    {label:'MATRIZ Acum.',data:m_acum,borderColor:'#f57c00',backgroundColor:'rgba(245,124,0,0.1)',fill:true,tension:.3},
+    {label:'FILIAL Acum.',data:f_acum,borderColor:'#1976d2',backgroundColor:'rgba(25,118,210,0.1)',fill:true,tension:.3},
+    {label:'Meta M',data:metaM,borderColor:'#ffa726',borderDash:[6,3],borderWidth:1,pointRadius:0,fill:false},
+    {label:'Meta F',data:metaF,borderColor:'#42a5f5',borderDash:[6,3],borderWidth:1,pointRadius:0,fill:false}
+  ]},
+  options:{responsive:true,plugins:{legend:{position:'top'}},scales:{y:{ticks:{callback:function(v){return'R$'+v.toLocaleString('pt-BR');}}}}}
+}});
+</script>
+</body>
+</html>
