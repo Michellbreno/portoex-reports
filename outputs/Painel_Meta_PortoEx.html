@@ -122,6 +122,7 @@
     <div class="chart-card"><h4>% Meta Acumulada por Unidade</h4><canvas id="pctChart" height="160"></canvas></div>
     <div class="chart-card"><h4>Participacao Diaria (%)</h4><canvas id="dailyPctChart" height="160"></canvas></div>
   </div>
+  <div class="chart-card" style="margin-top:16px"><h4>Faturamento Diario em R$ por Unidade</h4><canvas id="dailyReaisChart" height="90"></canvas></div>
 
   <div class="section-title">Ritmo por Vendedor</div>
   <div class="velo-grid">
@@ -405,6 +406,31 @@ new Chart(document.getElementById('dailyPctChart'),{
   ]},
   options:{responsive:true,plugins:{legend:{position:'top',labels:{color:'#8b949e'}}},scales:{x:{ticks:{color:'#8b949e'}},y:{ticks:{color:'#8b949e',callback:function(v){return v+'%'}}}}}
 }});
+
+new Chart(document.getElementById('dailyReaisChart'),{
+  type:'bar',
+  data:{labels:dias,datasets:[
+    {label:'MATRIZ R
+</body>
+</html>
+,data:mDaily,backgroundColor:'rgba(245,124,0,0.75)',borderRadius:4},
+    {label:'FILIAL R
+</body>
+</html>
+,data:fDaily,backgroundColor:'rgba(66,165,245,0.75)',borderRadius:4}
+  ]},
+  options:{
+    responsive:true,
+    plugins:{
+      legend:{position:'top',labels:{color:'#8b949e'}},
+      tooltip:{callbacks:{label:function(ctx){return ctx.dataset.label+': R$ '+ctx.parsed.y.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});}}}
+    },
+    scales:{
+      x:{ticks:{color:'#8b949e'}},
+      y:{ticks:{color:'#8b949e',callback:function(v){return 'R$ '+v.toLocaleString('pt-BR',{maximumFractionDigits:0});}}}
+    }
+  }
+});
 </script>
 </body>
 </html>
