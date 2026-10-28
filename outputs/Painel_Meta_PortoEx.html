@@ -392,12 +392,12 @@ new Chart(document.getElementById('pctChart'),{
     {label:'Ideal',data:idealLine,borderColor:'#58a6ff',borderDash:[4,4],borderWidth:1.5,pointRadius:0,fill:false}
   ]},
   options:{responsive:true,plugins:{legend:{position:'top',labels:{color:'#8b949e'}}},scales:{x:{ticks:{color:'#8b949e'}},y:{ticks:{color:'#8b949e',callback:function(v){return v+'%'}}}}}
-}});
+});
 
 var totalDailyPct=dias.map(function(_,i){
   var td=mDaily[i]+fDaily[i];
   return parseFloat((td/(3100000.0+1200000.0)*100).toFixed(1));
-}});
+});
 new Chart(document.getElementById('dailyPctChart'),{
   type:'bar',
   data:{labels:dias,datasets:[
@@ -405,7 +405,7 @@ new Chart(document.getElementById('dailyPctChart'),{
     {label:'FILIAL %',data:fDaily.map(function(v){return parseFloat((v/1200000.0*100).toFixed(1));}) ,backgroundColor:'rgba(66,165,245,0.7)',borderRadius:3}
   ]},
   options:{responsive:true,plugins:{legend:{position:'top',labels:{color:'#8b949e'}}},scales:{x:{ticks:{color:'#8b949e'}},y:{ticks:{color:'#8b949e',callback:function(v){return v+'%'}}}}}
-}});
+});
 
 new Chart(document.getElementById('dailyReaisChart'),{
   type:'bar',
