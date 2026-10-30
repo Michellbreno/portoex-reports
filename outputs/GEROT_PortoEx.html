@@ -55,8 +55,16 @@
   .pipe-row:last-child{border-bottom:none;} .pipe-hdr{font-size:.72rem;font-weight:700;color:#999;text-transform:uppercase;}
   .alert{background:#fff8e1;border-left:4px solid #ffa000;border-radius:6px;padding:10px 14px;font-size:.82rem;margin-bottom:14px;color:#555;}
   .alert.info{background:#e3f2fd;border-color:#1976d2;}
+  .gauge-row{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:14px;}
+  .gauge-card{background:#fff;border-radius:14px;padding:20px;box-shadow:0 1px 8px #0001;display:flex;flex-direction:column;align-items:center;}
+  .gauge-card h3{font-size:.95rem;font-weight:700;margin-bottom:6px;}
+  .gauge-card h3.orange{color:#e65100;} .gauge-card h3.blue{color:#0d47a1;}
+  canvas.gauge{display:block;}
+  .gauge-pct{font-size:2.4rem;font-weight:800;margin-top:4px;}
+  .gauge-pct.orange{color:#e65100;} .gauge-pct.blue{color:#0d47a1;}
+  .gauge-sub{font-size:.78rem;color:#888;margin-top:4px;text-align:center;}
   footer{text-align:center;font-size:.75rem;color:#aaa;margin:30px 0 16px;}
-  @media(max-width:700px){.unit-grid,.charts-grid,.vendor-grid,.top-grid,.two-col{grid-template-columns:1fr;}}
+  @media(max-width:700px){.unit-grid,.charts-grid,.vendor-grid,.top-grid,.two-col,.gauge-row{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
@@ -76,6 +84,22 @@
     <div class="kpi purple"><div class="label">Total Geral</div><div class="value" style="color:#4a148c">R$4.051.677</div><div class="sub">5,845 NFs totais</div></div>
     <div class="kpi green"><div class="label">Media / Dia</div><div class="value" style="color:#2e7d32">R$192.937</div><div class="sub">M: R$142.873 - F: R$50.064</div></div>
     <div class="kpi red"><div class="label">Falta para Meta</div><div class="value" style="color:#b71c1c">R$248.323</div><div class="sub">em 0 dias uteis restantes</div></div>
+  </div>
+
+  <div class="section-title">Velocimetro de Meta</div>
+  <div class="gauge-row">
+    <div class="gauge-card">
+      <h3 class="orange">MATRIZ â Itajai SC</h3>
+      <canvas class="gauge" id="gaugeM" width="220" height="120"></canvas>
+      <div class="gauge-pct orange">96,8%</div>
+      <div class="gauge-sub">21/21 dias uteis &nbsp;|&nbsp; Meta R$3.100.000 &nbsp;|&nbsp; Ideal 100,0%</div>
+    </div>
+    <div class="gauge-card">
+      <h3 class="blue">FILIAL â Sao Paulo SP</h3>
+      <canvas class="gauge" id="gaugeF" width="220" height="120"></canvas>
+      <div class="gauge-pct blue">87,6%</div>
+      <div class="gauge-sub">21/21 dias uteis &nbsp;|&nbsp; Meta R$1.200.000 &nbsp;|&nbsp; Ideal 100,0%</div>
+    </div>
   </div>
 
   <div class="section-title">Desempenho por Unidade</div>
@@ -220,9 +244,9 @@
       </div>
       <div class="top-row">
         <span class="top-rank">3</span>
-        <span class="top-name">FORTE TRANSPORTES DO BRASIL@TLDA</span>
+        <span class="top-name">FORTE TRANSPORTES DO BRASIL LTDA</span>
         <span class="top-val">R$249.370</span>
-        <span class="top-pct">8,2%</span>
+        <span class="top-pct">8,3%</span>
       </div>
       <div class="top-row">
         <span class="top-rank">4</span>
@@ -232,7 +256,7 @@
       </div>
       <div class="top-row">
         <span class="top-rank">5</span>
-        <span class="top-name">AC COMERCIAL IMPORTADORA E EXPORTADâ¦</span>
+        <span class="top-name">AC COMERCIAL IMPORTADORA E EXPORT@Äâ¦</span>
         <span class="top-val">R$142.972</span>
         <span class="top-pct">4,8%</span>
       </div>
@@ -375,6 +399,22 @@
 </div>
 <footer>PortoEx - GROT Outubro 2026 - Gerado em 30/10/2026</footer>
 <script>
+function drawGauge(id, pct, color) {
+  var c = document.getElementById(id);
+  var ctx = c.getContext("2d");
+  var cx = c.width/2, cy = c.height-10, r = 90;
+  ctx.clearRect(0, 0, c.width, c.height);
+  ctx.beginPath(); ctx.arc(cx,cy,r,Math.PI,0,false);
+  ctx.strokeStyle="#e0e0e0"; ctx.lineWidth=18; ctx.stroke();
+  var angle = Math.PI * Math.min(pct/100, 1);
+  ctx.beginPath(); ctx.arc(cx,cy,r,Math.PI,Math.PI+angle,false);
+  ctx.strokeStyle=color; ctx.lineWidth=18; ctx.lineCap="round"; ctx.stroke();
+  var idealAngle = Math.PI * 1.0000;
+  ctx.beginPath(); ctx.arc(cx,cy,r,Math.PI+idealAngle-0.01,Math.PI+idealAngle+0.01,false);
+  ctx.strokeStyle="#1976d2"; ctx.lineWidth=24; ctx.stroke();
+}
+drawGauge("gaugeM", 96.8, "#f57c00");
+drawGauge("gaugeF", 87.6, "#42a5f5");
 var dias=["01/10", "02/10", "05/10", "06/10", "07/10", "08/10", "09/10", "13/10", "14/10", "15/10", "16/10", "19/10", "20/10", "21/10", "22/10", "23/10", "26/10", "27/10", "28/10", "29/10", "30/10"];
 var m_daily=[115387.19, 164447.27, 130547.12, 92674.36, 181820.36, 117575.34, 80610.3, 312026.52, 104545.4, 342777.22, 134226.89, 108413.3, 203368.79, 195726.29, 149005.67, 140908.01, 119784.2, 90895.51, 131445.23, 76118.2, 8023.12];
 var f_daily=[61647.85, 35164.68, 17052.75, 68272.51, 61386.74, 63446.68, 62960.61, 31117.04, 55521.23, 51504.2, 41142.15, 64869.87, 29399.06, 41859.36, 25830.25, 95800.6, 44726.17, 29840.04, 99997.77, 63091.47, 6719.36];
